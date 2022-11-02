@@ -101,8 +101,6 @@ public class ServerThread extends Thread {
                         output.println("Fin de Session ");
                         i = 0;
                     }
-
-                    System.out.println("Nom : " + outputString);
                 }
                 
             }

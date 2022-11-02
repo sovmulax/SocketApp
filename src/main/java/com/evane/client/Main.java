@@ -61,7 +61,7 @@ public class Main {
                     output.println(userInput);
                 }else if (i == 4) {
                     // saisie des données
-                    System.out.println("Voulez-Vous continuez ? : \n (no):non \n (exit):oui \n =>");
+                    System.out.println("Voulez-Vous continuez ? : \n (no):oui \n (exit):non \n =>");
                     userInput = scanner.nextLine();
                     clientName = userInput;
 
