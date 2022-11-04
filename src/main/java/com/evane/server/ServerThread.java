@@ -1,17 +1,12 @@
 package com.evane.server;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import java.lang.reflect.Method;
-import java.util.Scanner;
-
 public class ServerThread extends Thread {
-    private Socket socket;
-    private ArrayList<ServerThread> threadList;
+    private final Socket socket;
+    private final ArrayList<ServerThread> threadList;
     private PrintWriter output;
 
     public ServerThread(Socket socket, ArrayList<ServerThread> threads) {
@@ -22,91 +17,103 @@ public class ServerThread extends Thread {
     @Override
     public void run() {
         try {
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             DataManager dm = new DataManager();
-            Personne p;
-            int id;
-
-            // Reading the input from Client
-            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            // variales
-            int methode = 0;
-            String nom = null;
-            int age = 0;
-            int i = 0;
+            ArrayList<String> callStack = new ArrayList<>();
 
             // returning the output to the client : true statement is to flush the buffer
             // otherwise
-            // we have to do it manuallyy
+            // we have to do it manually
             output = new PrintWriter(socket.getOutputStream(), true);
-            System.out.println("Bienvenue sur l'application");
 
-            // inifite loop for server
+            System.out.println("Client connecté !");
+            //outputStream.writeUTF("Bienvenue sur l'application");
+
+            // infinite loop for server
             while (true) {
-                i++;
+                if (callStack.size() < 1) {
+                    System.out.println("Printing menu...");
+                    outputStream.writeUTF("Choisissez une option du Menu : \n (1):addPersonne \n (2):getId \n (3):getPersonne \n =>");
+                }
 
-                if (i == 1) {
-                    String outputString = input.readLine();
+                if (callStack.size() == 1) {
+                    System.out.println("Get first arg");
+                    int menuOption;
 
-                    if (Integer.parseInt(outputString) == 1) {
-                        methode = 1;
-                        System.out.println("addPersonne");
-
-                    } else if (Integer.parseInt(outputString) == 2) {
-                        methode = 2;
-                        System.out.println("getId ");
-
-                    } else if (Integer.parseInt(outputString) == 3) {
-                        methode = 3;
-                        System.out.println("getPersonne ");
-
+                    try {
+                        menuOption = Integer.parseInt(callStack.get(0));
+                    } catch (NumberFormatException numberFormatException) {
+                        menuOption = 0;
                     }
 
-                } else if (i == 2) {
-                    String outputString = input.readLine();
-                    //output.println("deux" + outputString);
-                    nom = outputString;
-
-                    System.out.println("Nom : " + outputString);
-
-                } else if (i == 3) {
-                    String outputString = input.readLine();
-                    System.out.println("Age : " + outputString);
-                    
-                    age = Integer.parseInt(outputString);
-
-                    if (methode == 1) {
-                        p = new Personne(age, nom);
-                        id = dm.getId(p);
-                        if(id == -1){
-                            id = dm.addPersonne(p);
-                            output.println("Vous avez été Ajouté: " + id);
-                        }else{
-                            output.println("Vous êtes déjà dans la liste. \n votre id : " + id);
-                        }
-                    } else if (methode == 2) {
-                        p = new Personne(age, nom);
-                        id = dm.getId(p);
-                        output.println("Votre id : " + id);
-                    } else if (methode == 3) {
-                        p = dm.getPersonne(dm.getId(new Personne(age, nom)));
-                        id = dm.addPersonne(p);
-                        output.println("Nom : " + p.nom + " Age :" + p.age);
-                    }
-                    // print le resultat
-                    //output.println(outputString);
-                }else if (i == 4) {
-                    String outputString = input.readLine();
-                    if (!outputString.equals("no") ) {
-                        output.println("Fin de Session ");
-                        i = 0;
+                    switch (menuOption) {
+                        case 1:
+                            outputStream.writeUTF("Vous voulez ajouter une personne... Veuillez saisir son nom : ");
+                            break;
+                        case 2:
+                            outputStream.writeUTF("Vous voulez récupérer l'ID d'une personne... Veuillez saisir son nom : ");
+                            break;
+                        case 3:
+                            outputStream.writeUTF("Vous voulez récupérer les informations d'une personne... Veuillez saisir son ID : ");
+                            break;
+                        default:
+                            outputStream.writeUTF("Veuillez choisir parmi les options du menu !");
+                            callStack.clear();
                     }
                 }
-                
-            }
 
+                if (callStack.size() == 2) {
+                    System.out.println("Get first arg");
+                    System.out.println(callStack);
+                    int option = Integer.parseInt(callStack.get(0));
+                    System.out.println(option);
+
+                    switch (option) {
+                        case 1:
+                            System.out.println("1");
+                        case 2:
+                            System.out.println("2");
+                            outputStream.writeUTF("Veuillez saisir son age : ");
+                            break;
+                        case 3:
+                            System.out.println("3");
+                            Personne p = dm.getPersonne(Integer.parseInt(callStack.get(1)));
+                            outputStream.writeUTF(p.toString());
+                            callStack.clear();
+                            break;
+                    }
+
+                    System.out.println("Out");
+                }
+
+                if (callStack.size() == 3) {
+                    System.out.println("Get second arg");
+                    int age = Integer.parseInt(callStack.get(2));
+                    String nom = callStack.get(1);
+                    Personne p = new Personne(age, nom);
+
+                    switch (Integer.parseInt(callStack.get(0))) {
+                        case 1:
+                            int addPersonneId = dm.addPersonne(p);
+                            outputStream.writeUTF("ID de la personne ajoutée : " + addPersonneId);
+                            callStack.clear();
+                            break;
+                        case 2:
+                            int personneId = dm.getId(p);
+                            outputStream.writeUTF("ID de la personne recherchée : " + personneId);
+                            callStack.clear();
+                            break;
+                    }
+                }
+
+                String request = inputStream.readUTF();
+                System.out.println("Client input: " + request);
+                System.out.println("Current callstack: " + callStack);
+                callStack.add(request);
+            }
         } catch (Exception e) {
-            System.out.println("Error occured " + e.getStackTrace());
+            System.out.println("Error occurred " + e.getStackTrace());
         }
     }
 
@@ -114,6 +121,5 @@ public class ServerThread extends Thread {
         for (ServerThread sT : threadList) {
             sT.output.println(outputString);
         }
-
     }
 }

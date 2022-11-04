@@ -1,8 +1,6 @@
 package com.evane.client;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -10,69 +8,41 @@ public class Main {
 
     public static void main(String[] args) {
         try (Socket socket = new Socket("localhost", 5000)) {
-            // reading the input from server
-            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            // returning the output to the server : true statement is to flush the buffer
-            // otherwise
-            // we have to do it manuallyy
-            PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-
-            // taking the user input
-            Scanner scanner = new Scanner(System.in);
-            String userInput = null;
-            String response;
-            String clientName = "empty";
-            int i = 0;
+            // Socket incoming stream
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            // Socket outgoing stream
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
             ClientRunnable clientRun = new ClientRunnable(socket);
 
+            Scanner scanner = new Scanner(System.in);
+
             new Thread(clientRun).start();
+
+            String userInput;
+
             // loop closes when user enters exit command
+            while (true) {
+                // Print server response
+                System.out.println(inputStream.readUTF());
+                // Get keyboard input
+                System.out.print("> ");
+                userInput = scanner.nextLine();
+                // Send request to the server
+                outputStream.writeUTF(userInput);
+                // Wait a bit for server to respond
+                Thread.sleep(500);
 
-            do {
-                i++;
+                if (!userInput.equals("exit")) break;
+            }
 
-                if (i == 1) {
-                    // saisie des données
-                    System.out.println(
-                            "Choisissez une Option du Menu : \n (1):addPersonne \n (2):getId \n (3):getPersonne \n =>");
-                    userInput = scanner.nextLine();
-                    clientName = userInput;
-
-                    /* envoie de donnée au serveur */
-                    output.println(userInput);
-
-                } else if (i == 2) {
-                    // saisie des données
-                    System.out.println("Nom : ");
-                    userInput = scanner.nextLine();
-                    clientName = userInput;
-
-                    /* envoie de donnée au serveur */
-                    output.println(userInput);
-                } else if (i == 3) {
-                    // saisie des données
-                    System.out.println("Age : ");
-                    userInput = scanner.nextLine();
-                    clientName = userInput;
-
-                    /* envoie de donnée au serveur */
-                    output.println(userInput);
-                }else if (i == 4) {
-                    // saisie des données
-                    System.out.println("Voulez-Vous continuez ? : \n (no):oui \n (exit):non \n =>");
-                    userInput = scanner.nextLine();
-                    clientName = userInput;
-
-                    /* envoie de donnée au serveur */
-                    output.println(userInput);
-                }
-
-            } while (!userInput.equals("exit"));
+            System.out.println("Closing this connection...");
+            socket.close();
+            inputStream.close();
+            outputStream.close();
 
         } catch (Exception e) {
-            System.out.println("Exception occured in client main: " + e.getStackTrace());
+            System.out.println("Exception occurred in client main: " + e.getStackTrace());
         }
     }
 }
