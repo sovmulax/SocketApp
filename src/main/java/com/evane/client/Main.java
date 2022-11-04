@@ -12,17 +12,11 @@ public class Main {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             // Socket outgoing stream
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-
-            ClientRunnable clientRun = new ClientRunnable(socket);
-
             Scanner scanner = new Scanner(System.in);
-
-            new Thread(clientRun).start();
-
             String userInput;
 
-            // loop closes when user enters exit command
-            while (true) {
+            // Loop closes when user enters exit command
+            do {
                 // Print server response
                 System.out.println(inputStream.readUTF());
                 // Get keyboard input
@@ -32,9 +26,7 @@ public class Main {
                 outputStream.writeUTF(userInput);
                 // Wait a bit for server to respond
                 Thread.sleep(500);
-
-                if (!userInput.equals("exit")) break;
-            }
+            } while (!userInput.equals("exit"));
 
             System.out.println("Closing this connection...");
             socket.close();
