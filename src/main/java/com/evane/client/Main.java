@@ -28,7 +28,7 @@ public class Main {
                 Thread.sleep(500);
             } while (!userInput.equals("exit"));
 
-            System.out.println("Closing this connection...");
+            System.out.println("Closing connection...");
             socket.close();
             inputStream.close();
             outputStream.close();
