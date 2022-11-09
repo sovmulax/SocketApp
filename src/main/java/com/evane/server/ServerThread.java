@@ -38,7 +38,6 @@ public class ServerThread extends Thread {
                 }
 
                 if (callStack.size() == 1) {
-                    System.out.println("Get first arg");
                     int menuOption;
 
                     try {
@@ -64,7 +63,6 @@ public class ServerThread extends Thread {
                 }
 
                 if (callStack.size() == 2) {
-                    System.out.println("Get first arg");
                     System.out.println(callStack);
                     int option = Integer.parseInt(callStack.get(0));
                     System.out.println(option);
@@ -83,12 +81,9 @@ public class ServerThread extends Thread {
                             callStack.clear();
                             break;
                     }
-
-                    System.out.println("Out");
                 }
 
                 if (callStack.size() == 3) {
-                    System.out.println("Get second arg");
                     int age = Integer.parseInt(callStack.get(2));
                     String nom = callStack.get(1);
                     Personne p = new Personne(age, nom);
