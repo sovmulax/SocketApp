@@ -7,11 +7,26 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        try (Socket socket = new Socket("localhost", 5000)) {
+        String adress = "";
+        Scanner scannerr = new Scanner(System.in);
+        System.out.println("Entrez votre adresse IP : ");
+        adress = scannerr.nextLine();
+        if (!ValidateIP((adress))) adress = "localhost";
+        
+        try (Socket socket = new Socket(adress, 5000)) {
             // Socket incoming stream
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             // Socket outgoing stream
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            // reading the input from server
+            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            // returning the output to the server : true statement is to flush the buffer
+            // otherwise
+            // we have to do it manuallyy
+            PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+
+            // taking the user input
             Scanner scanner = new Scanner(System.in);
             String userInput;
 
