@@ -15,7 +15,7 @@ public class Main {
         try (ServerSocket serversocket = new ServerSocket(5000)){
             while(true) {
                 Socket socket = serversocket.accept();
-                ServerThread serverThread = new ServerThread(socket, threadList);
+                ServerThread serverThread = new ServerThread(socket);
                 //starting the thread
                 threadList.add(serverThread); 
                 serverThread.start();

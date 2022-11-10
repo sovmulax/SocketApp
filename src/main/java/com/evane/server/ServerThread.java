@@ -6,12 +6,9 @@ import java.util.ArrayList;
 
 public class ServerThread extends Thread {
     private final Socket socket;
-    private final ArrayList<ServerThread> threadList;
-    private PrintWriter output;
 
-    public ServerThread(Socket socket, ArrayList<ServerThread> threads) {
+    public ServerThread(Socket socket) {
         this.socket = socket;
-        this.threadList = threads;
     }
 
     @Override
@@ -21,11 +18,6 @@ public class ServerThread extends Thread {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             DataManager dm = new DataManager();
             ArrayList<String> callStack = new ArrayList<>();
-
-            // returning the output to the client : true statement is to flush the buffer
-            // otherwise
-            // we have to do it manually
-            output = new PrintWriter(socket.getOutputStream(), true);
 
             System.out.println("Client connecté !");
             //outputStream.writeUTF("Bienvenue sur l'application");
@@ -109,12 +101,6 @@ public class ServerThread extends Thread {
             }
         } catch (Exception e) {
             System.out.println("Error occurred " + e.getStackTrace());
-        }
-    }
-
-    private void printToALlClients(String outputString) {
-        for (ServerThread sT : threadList) {
-            sT.output.println(outputString);
         }
     }
 }
