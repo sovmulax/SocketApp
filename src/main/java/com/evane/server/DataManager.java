@@ -51,6 +51,10 @@ public class DataManager {
         return personneVector.indexOf(p);
     }
 
+    public synchronized int getSize() {
+        return personneVector.size();
+    }
+
     /**
      * Programme qui permet de tester le fonctionnement de la classe
      * <code>DataManager</code> et de ses op�rations de gestion de

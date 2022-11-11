@@ -20,13 +20,14 @@ public class ServerThread extends Thread {
             ArrayList<String> callStack = new ArrayList<>();
 
             System.out.println("Client connecté !");
-            //outputStream.writeUTF("Bienvenue sur l'application");
+            // outputStream.writeUTF("Bienvenue sur l'application");
 
             // infinite loop for server
             while (true) {
                 if (callStack.size() < 1) {
                     System.out.println("Printing menu...");
-                    outputStream.writeUTF("Choisissez une option du Menu : \n (1):addPersonne \n (2):getId \n (3):getPersonne \n =>");
+                    outputStream.writeUTF(
+                            "Choisissez une option du Menu : \n (1):addPersonne \n (2):getId \n (3):getPersonne \n =>");
                 }
 
                 if (callStack.size() == 1) {
@@ -43,10 +44,24 @@ public class ServerThread extends Thread {
                             outputStream.writeUTF("Vous voulez ajouter une personne... Veuillez saisir son nom : ");
                             break;
                         case 2:
-                            outputStream.writeUTF("Vous voulez récupérer l'ID d'une personne... Veuillez saisir son nom : ");
+                            outputStream.writeUTF(
+                                    "Vous voulez récupérer l'ID d'une personne... Veuillez saisir son nom : ");
                             break;
                         case 3:
-                            outputStream.writeUTF("Vous voulez récupérer les informations d'une personne... Veuillez saisir son ID : ");
+                            outputStream.writeUTF(
+                                    "Vous voulez récupérer les informations d'une personne... Veuillez saisir son ID : ");
+                            break;
+                        case 4:
+                            // outputStream.writeUTF("");
+
+                            String getall = "Liste des personnes : \n";
+                            int size = dm.getSize();
+                            for (int index = 0; index < size; index++) {
+                                Personne text = dm.getPersonne(index);
+                                getall += "nom : " + text.nom + " " + "age : " + text.age;
+                            }
+                            outputStream.writeUTF(getall);
+                            callStack.clear();
                             break;
                         default:
                             outputStream.writeUTF("Veuillez choisir parmi les options du menu !");
